@@ -1,0 +1,527 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                Int                   @id @default(autoincrement())
+  email             String                @unique
+  password          String
+  name              String?
+  role              Role                  @default(USER)
+  organization_id   Int?                  @map("organization_id")
+  createdAt         DateTime              @default(now()) @map("created_at")
+  updatedAt         DateTime              @updatedAt @map("updated_at")
+  activities        Activity[]
+  cases             Case[]
+  evidenceHandlings ChainOfCustody[]
+  notes             Note[]
+  qaResponses       QAChecklistResponse[] @relation("CompletedBy")
+  assignedTasks     Task[]                @relation("AssignedTo")
+  organization      Organization?         @relation(fields: [organization_id], references: [id])
+  generatedReports  GeneratedReport[]
+  title             String?
+  auditLogs         AuditLog[]
+  isOrgAdmin        Boolean               @default(false) @map("is_org_admin")
+  qaTemplates       QATemplate[]
+  forensicImages    ForensicImage[]
+
+  @@map("users")
+}
+
+model Organization {
+  id               Int                   @id @default(autoincrement())
+  name             String
+  email            String?
+  phone            String?
+  website          String?
+  address          String?
+  city             String?
+  state            String?
+  zipcode          String?
+  domain           String?               @unique
+  subdomain        String?               @unique
+  maxUsers         Int                   @default(5) @map("max_users")
+  maxReadOnlyUsers Int                   @default(20) @map("max_readonly_users")
+  subscription     SubscriptionTier      @default(BASIC)
+  subscriptionEnds DateTime?             @map("subscription_ends")
+  createdAt        DateTime              @default(now()) @map("created_at")
+  updatedAt        DateTime              @updatedAt @map("updated_at")
+  customFields     CustomField[]
+  equipment        Equipment[]
+  evidenceTypes    EvidenceType[]
+  qaChecklistItems QAChecklistItem[]
+  softwareLicenses SoftwareLicense[]
+  taskTemplates    TaskTemplate[]
+  users            User[]
+  auditLogs        AuditLog[]
+  cases            Case[]
+  reportTemplates  ReportTemplate[]
+  qaTemplates      QATemplate[]
+  evidenceLocations EvidenceLocation[]
+  contacts         Contact[]
+  messages         Message[]
+
+  @@map("organizations")
+}
+
+model Case {
+  id               Int                   @id @default(autoincrement())
+  name             String
+  description      String?
+  clientName       String?
+  clientOrganization String?
+  clientEmail      String?
+  clientAddress    String?
+  clientCity       String?
+  clientState      String?
+  clientZipcode    String?
+  summary          String?
+  analysis         String?
+  status           String                @default("Open")
+  caseDate         DateTime?             @map("case_date")
+  caseCategory     String?               @map("case_category")
+  caseType         String?               @map("case_type")
+  casePriority     String?               @map("case_priority")
+  caseNotes        String?               @map("case_notes")
+  chainOfCustody   String?               @map("chain_of_custody")
+  caseAssignee     String?               @map("case_assignee")
+  caseExaminer     String?               @map("case_examiner")
+  caseInvestigator String?               @map("case_investigator")
+  caseLead         String?               @map("case_lead")
+  organization_id   Int?                  @map("organization_id")
+  organization     Organization?         @relation(fields: [organization_id], references: [id])
+  organizationName String?
+  stage            String                @default("pending")
+  evidenceCount    Int                   @default(0) @map("evidence_count")
+  storageTotal     BigInt                @default(0) @map("storage_total")
+  activeTasks      Int                   @default(0) @map("active_tasks")
+  user_id          Int                   @map("user_id")
+  createdAt        DateTime              @default(now()) @map("created_at")
+  updatedAt        DateTime              @updatedAt @map("updated_at")
+  activities       Activity[]
+  custodyActions   CaseAction[]
+  user             User                  @relation(fields: [user_id], references: [id])
+  evidence         Evidence[]
+  notes            Note[]
+  qaResponses      QAChecklistResponse[]
+  tasks            Task[]
+  generatedReports GeneratedReport[]
+  contacts         Contact[]   @relation("CaseContacts")
+  messages         Message[]
+  forensicImages   ForensicImage[]
+
+  @@map("cases")
+}
+
+model ForensicImage {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  imageType   String   @map("image_type")
+  symlinkPath String   @map("symlink_path")
+  size        BigInt?
+  case_id     Int      @map("case_id")
+  user_id     Int      @map("user_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  case        Case     @relation(fields: [case_id], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [user_id], references: [id])
+
+  @@map("forensic_images")
+}
+
+model CaseAction {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  case_id     Int      @map("case_id")
+  isDefault   Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  case        Case     @relation(fields: [case_id], references: [id], onDelete: Cascade)
+
+  @@unique([case_id, name])
+  @@map("case_actions")
+}
+
+model Note {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  case_id   Int      @map("case_id")
+  user_id   Int      @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  case      Case     @relation(fields: [case_id], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [user_id], references: [id])
+
+  @@map("notes")
+}
+
+model Activity {
+  id          Int      @id @default(autoincrement())
+  description String
+  case_id     Int      @map("case_id")
+  user_id     Int      @map("user_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  case        Case     @relation(fields: [case_id], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [user_id], references: [id])
+
+  @@map("activities")
+}
+
+model Evidence {
+  id              Int                   @id @default(autoincrement())
+  name            String
+  description     String?
+  evidenceNumber  String                @unique @map("evidence_number")
+  type_id         Int                   @map("type_id")
+  case_id         Int                   @map("case_id")
+  status          String                @default("In Custody")
+  location        String?
+  storageLocation String?               @map("storage_location")
+  md5Hash         String?               @map("md5_hash")
+  sha256Hash      String?               @map("sha256_hash")
+  acquisitionDate DateTime?             @map("acquisition_date")
+  size            BigInt?
+  filePath        String?               @map("file_path")
+  originalName    String?               @map("original_name")
+  mimeType        String?               @map("mime_type")
+  createdAt       DateTime              @default(now()) @map("created_at")
+  updatedAt       DateTime              @updatedAt @map("updated_at")
+  chainOfCustody  ChainOfCustody[]
+  case            Case                  @relation(fields: [case_id], references: [id], onDelete: Cascade)
+  type            EvidenceType          @relation(fields: [type_id], references: [id])
+  customFields    EvidenceCustomField[]
+  evidenceLocation        EvidenceLocation?     @relation(fields: [evidenceLocation_id], references: [id])
+  evidenceLocation_id     Int?                  @map("evidence_location_id")
+
+  @@map("evidence")
+}
+
+model EvidenceType {
+  id              Int          @id @default(autoincrement())
+  name            String
+  description     String?
+  organization_id Int          @map("organization_id")
+  isDefault       Boolean      @default(false)
+  order          Int          @default(0)
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+  evidence        Evidence[]
+  organization    Organization @relation(fields: [organization_id], references: [id])
+
+  @@unique([organization_id, name])
+  @@map("evidence_types")
+}
+
+model CustomField {
+  id              Int                   @id @default(autoincrement())
+  name            String
+  label           String
+  type            String
+  required        Boolean               @default(false)
+  options         String?
+  organization_id Int                   @map("organization_id")
+  createdAt       DateTime              @default(now()) @map("created_at")
+  updatedAt       DateTime              @updatedAt @map("updated_at")
+  organization    Organization          @relation(fields: [organization_id], references: [id])
+  evidenceFields  EvidenceCustomField[]
+
+  @@unique([organization_id, name])
+  @@map("custom_fields")
+}
+
+model EvidenceCustomField {
+  id          Int         @id @default(autoincrement())
+  evidence_id Int         @map("evidence_id")
+  field_id    Int         @map("field_id")
+  value       String
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+  evidence    Evidence    @relation(fields: [evidence_id], references: [id], onDelete: Cascade)
+  field       CustomField @relation(fields: [field_id], references: [id])
+
+  @@unique([evidence_id, field_id])
+  @@map("evidence_custom_fields")
+}
+
+model ChainOfCustody {
+  id          Int      @id @default(autoincrement())
+  evidence_id Int      @map("evidence_id")
+  user_id     Int      @map("user_id")
+  action      String
+  reason      String?
+  location    String?
+  signature   String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  evidence    Evidence @relation(fields: [evidence_id], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [user_id], references: [id])
+
+  @@map("chain_of_custody")
+}
+
+model SoftwareLicense {
+  id              Int          @id @default(autoincrement())
+  vendor          String
+  softwareName    String       @map("software_name")
+  licenseName     String       @map("license_name")
+  edition         String?
+  purchaseDate    DateTime?    @map("purchase_date")
+  expireDate      DateTime?    @map("expire_date")
+  cost            Decimal?     @db.Decimal(10, 2)
+  smsCost         Decimal?     @map("sms_cost") @db.Decimal(10, 2)
+  location        String?
+  notes           String?
+  organization_id Int          @map("organization_id")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+  organization    Organization @relation(fields: [organization_id], references: [id], onDelete: Cascade)
+
+  @@map("software_licenses")
+}
+
+model Equipment {
+  id              Int          @id @default(autoincrement())
+  name            String
+  type            String
+  serialNumber    String?      @map("serial_number")
+  status          String       @default("Available")
+  location        String?
+  lastCalibration DateTime?    @map("last_calibration")
+  nextCalibration DateTime?    @map("next_calibration")
+  lastMaintenance DateTime?    @map("last_maintenance")
+  nextMaintenance DateTime?    @map("next_maintenance")
+  notes           String?
+  organization_id Int          @map("organization_id")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+  organization    Organization @relation(fields: [organization_id], references: [id], onDelete: Cascade)
+
+  @@map("equipment")
+}
+
+model QATemplate {
+  id              Int              @id @default(autoincrement())
+  name            String
+  type            String           @default("ORGANIZATION")
+  organization    Organization     @relation(fields: [organization_id], references: [id], onDelete: Cascade)
+  organization_id Int              @map("organization_id")
+  user            User?            @relation(fields: [user_id], references: [id])
+  user_id         Int?             @map("user_id")
+  checklistItems  QAChecklistItem[]
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  @@map("qa_templates")
+  @@index([user_id])
+}
+
+model QAChecklistItem {
+  id              Int                   @id @default(autoincrement())
+  name            String
+  description     String?
+  category        String
+  required        Boolean               @default(false)
+  order           Int                   @default(0)
+  organization_id Int                   @map("organization_id")
+  template        QATemplate?           @relation(fields: [template_id], references: [id])
+  template_id     Int?                  @map("template_id")
+  organization    Organization          @relation(fields: [organization_id], references: [id], onDelete: Cascade)
+  responses       QAChecklistResponse[]
+  createdAt       DateTime              @default(now()) @map("created_at")
+  updatedAt       DateTime              @updatedAt @map("updated_at")
+  value           String?
+  notes           String?
+
+  @@map("qa_checklist_items")
+}
+
+model QAChecklistResponse {
+  id                Int             @id @default(autoincrement())
+  checklist_item_id Int             @map("checklist_item_id")
+  case_id           Int             @map("case_id")
+  completed         Boolean         @default(false)
+  notes             String?
+  completed_by      Int             @map("completed_by")
+  completedAt       DateTime        @default(now()) @map("completed_at")
+  value            String
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+  case              Case            @relation(fields: [case_id], references: [id], onDelete: Cascade)
+  checklistItem     QAChecklistItem @relation(fields: [checklist_item_id], references: [id], onDelete: Cascade)
+  completedBy       User            @relation("CompletedBy", fields: [completed_by], references: [id])
+
+  @@map("qa_checklist_responses")
+}
+
+model TaskTemplate {
+  id              Int          @id @default(autoincrement())
+  name            String
+  description     String?
+  category        String
+  estimatedHours  Int?         @map("estimated_hours")
+  checklist       Json?
+  organization_id Int          @map("organization_id")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+  organization    Organization @relation(fields: [organization_id], references: [id], onDelete: Cascade)
+  tasks           Task[]
+
+  @@map("task_templates")
+}
+
+model Task {
+  id             Int           @id @default(autoincrement())
+  name           String
+  description    String?
+  status         String        @default("Pending")
+  priority       String        @default("Medium")
+  dueDate        DateTime?     @map("due_date")
+  assigned_to    Int?          @map("assigned_to")
+  case_id        Int          @map("case_id")
+  template_id    Int?          @map("template_id")
+  estimatedHours Int?          @map("estimated_hours")
+  actualHours    Int?          @map("actual_hours")
+  checklist      Json?
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  assignedTo     User?         @relation("AssignedTo", fields: [assigned_to], references: [id])
+  case           Case          @relation(fields: [case_id], references: [id], onDelete: Cascade)
+  template       TaskTemplate? @relation(fields: [template_id], references: [id])
+
+  @@map("tasks")
+}
+
+model ReportTemplate {
+  id               Int               @id @default(autoincrement())
+  name             String
+  description      String?
+  sections         Json // Stores the sections array
+  type             String // 'word' | 'pdf'
+  category         String // 'evidence' | 'case' | 'analysis' | 'summary'
+  organizationId   Int?              @map("organization_id")
+  metadata         Json // Stores styling, headers, etc.
+  version          String            @default("1.0.0")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+  organization     Organization?     @relation(fields: [organizationId], references: [id])
+  generatedReports GeneratedReport[]
+
+  @@map("report_templates")
+}
+
+model GeneratedReport {
+  id        Int      @id @default(autoincrement())
+  name      String
+  fileType  String
+  filePath  String
+  metadata  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId     Int
+  user       User           @relation(fields: [userId], references: [id])
+  
+  caseId     Int
+  case       Case           @relation(fields: [caseId], references: [id])
+  
+  templateId Int?          // Explicitly mark as nullable
+  template   ReportTemplate? @relation(fields: [templateId], references: [id])
+
+  @@map("generated_reports")
+  @@index([userId])
+  @@index([caseId])
+  @@index([templateId])
+}
+
+enum Role {
+  ADMIN
+  USER
+  READ_ONLY
+}
+
+enum SubscriptionTier {
+  BASIC
+  PRO
+  ENTERPRISE
+}
+
+model AuditLog {
+  id              Int          @id @default(autoincrement())
+  action          String
+  resourceType    String       @map("resource_type")
+  resourceId      String       @map("resource_id")
+  details         Json?
+  user_id         Int          @map("user_id")
+  organization_id Int          @map("organization_id")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+  user            User         @relation(fields: [user_id], references: [id])
+  organization    Organization @relation(fields: [organization_id], references: [id])
+
+  @@index([resourceType, resourceId])
+  @@index([user_id])
+  @@index([organization_id])
+  @@map("audit_logs")
+}
+
+model EvidenceLocation {
+  id              Int          @id @default(autoincrement())
+  name            String
+  description     String?
+  isDefault       Boolean      @default(false)
+  order          Int          @default(0)
+  organization_id Int          @map("organization_id")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+  organization    Organization @relation(fields: [organization_id], references: [id])
+  evidence        Evidence[]
+
+  @@map("evidence_locations")
+}
+
+model Contact {
+  id              Int          @id @default(autoincrement())
+  name            String
+  email           String?
+  phone           String?
+  organization    String?
+  notes           String?
+  organization_id Int?         @map("organization_id")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+  cases           Case[]       @relation("CaseContacts")
+  org             Organization? @relation(fields: [organization_id], references: [id])
+  important       Boolean      @default(false)
+  messages        Message[]
+
+  @@map("contacts")
+}
+
+model Message {
+  id              Int          @id @default(autoincrement())
+  message         String       @db.Text
+  contact_id      Int          @map("contact_id") 
+  case_id         Int?         @map("case_id")
+  organization_id Int          @map("organization_id")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+  contact         Contact      @relation(fields: [contact_id], references: [id])
+  case            Case?        @relation(fields: [case_id], references: [id])
+  organization    Organization @relation(fields: [organization_id], references: [id])
+  attachments     Json?
+
+  @@index([contact_id])
+  @@index([case_id])
+  @@index([organization_id])
+  @@map("messages")
+}

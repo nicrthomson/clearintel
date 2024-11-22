@@ -1,0 +1,61 @@
+# Dependencies and build
+/node_modules
+/.next
+/.vercel
+.vercelignore
+
+# Environment files
+.env*
+!.env.example
+
+# IDE and system files
+.DS_Store
+.vscode
+.idea
+
+# Debug and history files
+.aider.chat.history.md
+.aider.input.history
+.aider.tags.cache.v3
+
+# Temporary and local files
+temp.txt
+commands.txt
+qa_template.txt
+schema_updates.txt
+test-prisma.ts
+def process_tree(lines):.py.py
+process_tree.py
+
+# Generated files
+next-env.d.ts
+
+# Upload and report directories
+/uploads
+/quickreports
+/public/reports
+/public/uploads
+
+# Assets and images
+mono.png
+screen.png
+add-folder
+
+# Documentation (optional, if you want to exclude)
+# ADMIN_SETUP.md
+# CLEANUP.md
+# COMMANDS.md
+# README.md
+# SETUP.md
+
+# Build outputs
+*.log
+.turbo
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+
+# Local development
+local.*
+*.local
