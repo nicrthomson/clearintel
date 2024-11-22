@@ -13,6 +13,17 @@ export interface QAChecklistItem {
   updatedAt: Date
 }
 
+// New type for client-side item creation
+export interface QAChecklistItemCreate {
+  name: string
+  description?: string | null
+  category: string
+  required: boolean
+  order: number
+  value?: string | null
+  notes?: string | null
+}
+
 export interface QATemplate {
   id: number
   name: string

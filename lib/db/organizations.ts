@@ -34,7 +34,7 @@ export async function getOrganizationById(id: number) {
           role: true,
         },
       },
-      settings: true,
+      organizationSettings: true,
       evidenceTypes: true,
       customFields: true,
     },

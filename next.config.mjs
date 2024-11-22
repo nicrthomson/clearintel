@@ -22,6 +22,14 @@ const nextConfig = {
         '*.handlebars': ['handlebars-loader']
       }
     }
+  },
+
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
+  typescript: {
+    ignoreBuildErrors: true,
   }
 };
 

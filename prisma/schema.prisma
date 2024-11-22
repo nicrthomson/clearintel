@@ -65,6 +65,7 @@ model Organization {
   evidenceLocations EvidenceLocation[]
   contacts         Contact[]
   messages         Message[]
+  organizationSettings OrganizationSetting[]
 
   @@map("organizations")
 }
@@ -524,4 +525,17 @@ model Message {
   @@index([case_id])
   @@index([organization_id])
   @@map("messages")
+}
+
+model OrganizationSetting {
+  id              Int           @id @default(autoincrement())
+  organization_id Int           @map("organization_id")
+  key             String
+  value           String
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+  organization    Organization  @relation(fields: [organization_id], references: [id])
+
+  @@unique([organization_id, key], name: "organization_id_key")
+  @@map("organization_settings")
 }

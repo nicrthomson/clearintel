@@ -10,12 +10,15 @@
             padding: 20px;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             background: #f5f5f5;
+            color: #333;
         }
         .gallery {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
             padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
         }
         .gallery-item {
             position: relative;
@@ -25,21 +28,31 @@
             cursor: pointer;
             transition: transform 0.3s ease;
             background: white;
+            aspect-ratio: 16/9;
         }
         .gallery-item:hover {
             transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
         .gallery-item img {
             width: 100%;
-            height: 200px;
+            height: 100%;
             object-fit: cover;
             display: block;
         }
         .gallery-item .caption {
-            padding: 10px;
-            background: white;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.9);
             font-size: 14px;
-            color: #333;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        .gallery-item:hover .caption {
+            transform: translateY(0);
         }
         .modal {
             display: none;
@@ -67,12 +80,14 @@
             max-width: 100%;
             max-height: 80vh;
             object-fit: contain;
+            border-radius: 4px;
         }
         .modal-caption {
             color: white;
             text-align: center;
-            margin-top: 10px;
+            margin-top: 20px;
             font-size: 16px;
+            max-width: 800px;
         }
         .close-button {
             position: absolute;
@@ -83,7 +98,8 @@
             cursor: pointer;
             background: none;
             border: none;
-            padding: 0;
+            padding: 10px;
+            z-index: 1001;
         }
         .nav-button {
             position: absolute;
@@ -96,69 +112,93 @@
             cursor: pointer;
             font-size: 24px;
             border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        .nav-button:hover {
+            background: rgba(255,255,255,0.2);
         }
         .prev-button { left: 20px; }
         .next-button { right: 20px; }
         h1 {
             text-align: center;
             color: #333;
-            margin-bottom: 30px;
+            margin: 30px 0;
+            font-size: 2.5em;
         }
-        .category-title {
-            grid-column: 1 / -1;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            color: #333;
-            font-size: 24px;
-            font-weight: 600;
+        .description {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            color: #666;
+            line-height: 1.6;
+        }
+        .counter {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-size: 16px;
+            z-index: 1001;
         }
     </style>
 </head>
 <body>
     <h1>Clear Intel Screenshot Gallery</h1>
+    <p class="description">
+        Explore our comprehensive digital forensics case management platform through this interactive gallery.
+        Click any image to view it in full size. Use arrow keys or buttons to navigate between images.
+    </p>
     <div class="gallery">
-        <h2 class="category-title">Case Management & Overview</h2>
-        <div class="gallery-item" data-category="case-management">
-            <img src="images/gallery/Screenshot 2024-11-22 at 2.00.44 AM.png" alt="Case Overview">
-            <div class="caption">Case Overview Dashboard</div>
+        <div class="gallery-item" data-category="dashboard">
+            <img src="images/SS1.png" alt="Dashboard Overview">
+            <div class="caption">Dashboard Overview - Main interface with key metrics and navigation</div>
         </div>
-        <div class="gallery-item" data-category="case-management">
-            <img src="images/gallery/Screenshot 2024-11-22 at 2.00.55 AM.png" alt="Case Details">
-            <div class="caption">Case Details View</div>
-        </div>
-
-        <h2 class="category-title">Evidence & Analysis</h2>
-        <div class="gallery-item" data-category="evidence">
-            <img src="images/gallery/Screenshot 2024-11-22 at 2.03.18 AM.png" alt="Evidence Management">
-            <div class="caption">Evidence Management Interface</div>
+        <div class="gallery-item" data-category="cases">
+            <img src="images/SS2.png" alt="Case Management">
+            <div class="caption">Case Management - Detailed case view and organization</div>
         </div>
         <div class="gallery-item" data-category="evidence">
-            <img src="images/gallery/Screenshot 2024-11-22 at 2.03.26 AM.png" alt="Evidence Details">
-            <div class="caption">Evidence Details and Analysis</div>
-        </div>
-
-        <h2 class="category-title">Quality Assurance</h2>
-        <div class="gallery-item" data-category="qa">
-            <img src="images/gallery/Screenshot 2024-11-22 at 2.04.16 AM.png" alt="QA Dashboard">
-            <div class="caption">Quality Assurance Dashboard</div>
+            <img src="images/SS3.png" alt="Evidence Management">
+            <div class="caption">Evidence Management - Digital evidence tracking system</div>
         </div>
         <div class="gallery-item" data-category="qa">
-            <img src="images/gallery/Screenshot 2024-11-22 at 2.04.23 AM.png" alt="QA Review">
-            <div class="caption">QA Review Process</div>
-        </div>
-
-        <h2 class="category-title">Task Management</h2>
-        <div class="gallery-item" data-category="tasks">
-            <img src="images/gallery/Screenshot 2024-11-22 at 2.04.29 AM.png" alt="Task List">
-            <div class="caption">Task Management Overview</div>
+            <img src="images/SS4.png" alt="Quality Assurance">
+            <div class="caption">Quality Assurance - Review and verification processes</div>
         </div>
         <div class="gallery-item" data-category="tasks">
-            <img src="images/gallery/Screenshot 2024-11-22 at 2.04.38 AM.png" alt="Task Details">
-            <div class="caption">Task Details and Assignment</div>
+            <img src="images/SS5.png" alt="Task Management">
+            <div class="caption">Task Management - Assignment and progress tracking</div>
         </div>
+        <div class="gallery-item" data-category="reports">
+            <img src="images/SS6.png" alt="Reporting">
+            <div class="caption">Reporting - Professional report generation tools</div>
+        </div>
+        <div class="gallery-item" data-category="analytics">
+            <img src="images/SS7.png" alt="Analytics">
+            <div class="caption">Analytics - Performance metrics and insights</div>
+        </div>
+        <div class="gallery-item" data-category="users">
+            <img src="images/SS8.png" alt="User Management">
+            <div class="caption">User Management - Access control and permissions</div>
+        </div>
+        <div class="gallery-item" data-category="settings">
+            <img src="images/SS9.png" alt="Settings">
+            <div class="caption">Settings - System configuration and preferences</div>
+        </div>
+        <div class="gallery-item" data-category="evidence">
+            <img src="images/SS10.png" alt="Evidence Analysis">
+            <div class="caption">Evidence Analysis - Detailed examination tools</div>
+        </div>
+        <!-- Add remaining screenshots SS11 through SS34 -->
+        <div class="gallery-item">
+            <img src="images/SS11.png" alt="Case Details">
+            <div class="caption">Case Details - In-depth case information and status</div>
+        </div>
+        <!-- Continue with remaining screenshots -->
     </div>
 
     <div class="modal">
+        <div class="counter">1 / 34</div>
         <button class="close-button">&times;</button>
         <button class="nav-button prev-button">&lt;</button>
         <button class="nav-button next-button">&gt;</button>
@@ -176,6 +216,7 @@
         const closeButton = modal.querySelector('.close-button');
         const prevButton = modal.querySelector('.prev-button');
         const nextButton = modal.querySelector('.next-button');
+        const counter = modal.querySelector('.counter');
         const items = document.querySelectorAll('.gallery-item');
         let currentIndex = 0;
 
@@ -195,6 +236,7 @@
             modalImg.src = img.src;
             modalImg.alt = img.alt;
             modalCaption.textContent = caption.textContent;
+            counter.textContent = `${currentIndex + 1} / ${items.length}`;
         }
 
         closeButton.addEventListener('click', () => {
@@ -230,6 +272,14 @@
                 updateModal();
             }
         });
+
+        // Preload images for smoother navigation
+        function preloadImages() {
+            items.forEach(item => {
+                const img = item.querySelector('img');
+                const preloadImg = new Image();
+                preloadImg.src = img.src;
+            });
+        }
+        preloadImages();
     </script>
-</body>
-</html>

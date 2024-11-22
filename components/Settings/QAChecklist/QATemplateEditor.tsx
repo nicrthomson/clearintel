@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dialog"
 import { GripVertical, Plus, ArrowLeft, X } from "lucide-react"
 import Link from "next/link"
-import { QATemplate, QAChecklistItem } from "@/lib/types/qa"
+import { QATemplate, QAChecklistItem, QAChecklistItemCreate } from "@/lib/types/qa"
 
 interface QATemplateEditorProps {
   template: QATemplate
@@ -28,7 +28,7 @@ export function QATemplateEditor({ template: initialTemplate }: QATemplateEditor
   const router = useRouter()
   const [template, setTemplate] = useState(initialTemplate)
   const [showNewItemDialog, setShowNewItemDialog] = useState(false)
-  const [newItem, setNewItem] = useState<Partial<QAChecklistItem>>({
+  const [newItem, setNewItem] = useState<Partial<QAChecklistItemCreate>>({
     name: "",
     description: "",
     category: "",
@@ -79,7 +79,7 @@ export function QATemplateEditor({ template: initialTemplate }: QATemplateEditor
   const handleAddItem = async () => {
     if (!newItem.name || !newItem.category) return
 
-    const item: QAChecklistItem = {
+    const item: QAChecklistItemCreate = {
       name: newItem.name,
       description: newItem.description || null,
       category: newItem.category,
@@ -89,7 +89,7 @@ export function QATemplateEditor({ template: initialTemplate }: QATemplateEditor
 
     const updatedTemplate = {
       ...template,
-      checklistItems: [...template.checklistItems, item],
+      checklistItems: [...template.checklistItems, item as QAChecklistItem],
     }
 
     await saveTemplate(updatedTemplate)
@@ -153,13 +153,13 @@ export function QATemplateEditor({ template: initialTemplate }: QATemplateEditor
   }
 
   // Group items by category
-  const groupedItems = template.checklistItems.reduce((acc, item) => {
+  const groupedItems = template.checklistItems.reduce<Record<string, QAChecklistItem[]>>((acc, item) => {
     if (!acc[item.category]) {
       acc[item.category] = []
     }
     acc[item.category].push(item)
     return acc
-  }, {} as Record<string, typeof template.checklistItems>)
+  }, {})
 
   return (
     <div className="space-y-6">
@@ -191,8 +191,8 @@ export function QATemplateEditor({ template: initialTemplate }: QATemplateEditor
           <Card key={category} className="p-6">
             <h4 className="text-sm font-medium mb-4">{category}</h4>
             <div className="space-y-4">
-              {items.map((item, index) => {
-                const globalIndex = template.checklistItems.findIndex(i => i === item)
+              {items.map((item: QAChecklistItem, index: number) => {
+                const globalIndex = template.checklistItems.findIndex((i: QAChecklistItem) => i === item)
                 return (
                   <div
                     key={item.id || index}
@@ -201,7 +201,7 @@ export function QATemplateEditor({ template: initialTemplate }: QATemplateEditor
                     } ${draggedIndex !== null ? 'cursor-move' : ''}`}
                     data-item-index={globalIndex}
                     draggable
-                    onDragStart={(e) => {
+                    onDragStart={(e: React.DragEvent) => {
                       setDraggedIndex(globalIndex)
                       e.dataTransfer.effectAllowed = 'move'
                       e.dataTransfer.setData('text/plain', globalIndex.toString())
@@ -220,17 +220,17 @@ export function QATemplateEditor({ template: initialTemplate }: QATemplateEditor
                     onDragEnd={() => {
                       setDraggedIndex(null)
                     }}
-                    onDragOver={(e) => {
+                    onDragOver={(e: React.DragEvent) => {
                       e.preventDefault()
                       e.dataTransfer.dropEffect = 'move'
                       
                       // Add visual feedback for drop target
                       e.currentTarget.classList.add('bg-secondary/40')
                     }}
-                    onDragLeave={(e) => {
+                    onDragLeave={(e: React.DragEvent) => {
                       e.currentTarget.classList.remove('bg-secondary/40')
                     }}
-                    onDrop={(e) => {
+                    onDrop={(e: React.DragEvent) => {
                       e.preventDefault()
                       e.currentTarget.classList.remove('bg-secondary/40')
                       const fromIndex = parseInt(e.dataTransfer.getData('text/plain'))
@@ -249,7 +249,7 @@ export function QATemplateEditor({ template: initialTemplate }: QATemplateEditor
                         <Input
                           id={`item-${globalIndex}-name`}
                           value={item.name}
-                          onChange={(e) => handleUpdateItem(globalIndex, { name: e.target.value })}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdateItem(globalIndex, { name: e.target.value })}
                           className="h-8"
                         />
                       </div>
@@ -258,7 +258,7 @@ export function QATemplateEditor({ template: initialTemplate }: QATemplateEditor
                         <Textarea
                           id={`item-${globalIndex}-description`}
                           value={item.description ?? ""}
-                          onChange={(e) => handleUpdateItem(globalIndex, { description: e.target.value })}
+                          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleUpdateItem(globalIndex, { description: e.target.value })}
                           className="h-20"
                         />
                       </div>
@@ -266,8 +266,8 @@ export function QATemplateEditor({ template: initialTemplate }: QATemplateEditor
                         <Checkbox
                           id={`item-${globalIndex}-required`}
                           checked={item.required}
-                          onCheckedChange={(checked) => 
-                            handleUpdateItem(globalIndex, { required: checked as boolean })
+                          onCheckedChange={(checked: boolean) => 
+                            handleUpdateItem(globalIndex, { required: checked })
                           }
                         />
                         <Label htmlFor={`item-${globalIndex}-required`}>Required</Label>
@@ -299,7 +299,7 @@ export function QATemplateEditor({ template: initialTemplate }: QATemplateEditor
               <Input
                 id="new-item-name"
                 value={newItem.name}
-                onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewItem({ ...newItem, name: e.target.value })}
               />
             </div>
             <div className="grid gap-2">
@@ -307,7 +307,7 @@ export function QATemplateEditor({ template: initialTemplate }: QATemplateEditor
               <Input
                 id="new-item-category"
                 value={newItem.category}
-                onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewItem({ ...newItem, category: e.target.value })}
                 list="categories"
               />
               <datalist id="categories">
@@ -321,15 +321,15 @@ export function QATemplateEditor({ template: initialTemplate }: QATemplateEditor
               <Textarea
                 id="new-item-description"
                 value={newItem.description ?? ""}
-                onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNewItem({ ...newItem, description: e.target.value })}
               />
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="new-item-required"
                 checked={newItem.required}
-                onCheckedChange={(checked) => 
-                  setNewItem({ ...newItem, required: checked as boolean })
+                onCheckedChange={(checked: boolean) => 
+                  setNewItem({ ...newItem, required: checked })
                 }
               />
               <Label htmlFor="new-item-required">Required</Label>
