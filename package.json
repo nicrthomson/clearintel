@@ -1,7 +1,9 @@
 {
-  "name": "case-management-tool",
+  "name": "clear-intel",
   "version": "0.1.0",
   "private": true,
+  "description": "Professional digital forensics case management platform",
+  "author": "Clear Intel",
   "scripts": {
     "predev": "node scripts/kill-port.js",
     "dev": "next dev --turbo --hostname 0.0.0.0 --port 3000",

@@ -1,0 +1,16 @@
+
+model QATemplate {
+  id              Int              @id @default(autoincrement())
+  name            String
+  type            String           @default("ORGANIZATION")
+  organization    Organization     @relation(fields: [organization_id], references: [id], onDelete: Cascade)
+  organization_id Int              @map("organization_id")
+  user            User?            @relation(fields: [user_id], references: [id])
+  user_id         Int?             @map("user_id")
+  checklistItems  QAChecklistItem[]
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  @@map("qa_templates")
+  @@index([user_id])
+}

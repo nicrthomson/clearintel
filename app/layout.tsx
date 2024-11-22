@@ -8,10 +8,20 @@ import { MainSidebar } from "@/components/Layout/MainSidebar"
 import { MainContent } from "@/components/Layout/MainContent"
 import { SidebarProvider } from "@/components/Layout/sidebar-context"
 import { Toaster } from "@/components/ui/toaster"
+import { ErrorBoundary } from "@/components/ErrorBoundary"
 
 export const metadata: Metadata = {
-  title: "Case Management Tool",
-  description: "Digital forensics case management system",
+  title: "Clear Intel | Digital Forensics Case Management",
+  description: "Professional digital forensics case management platform for streamlined investigations, evidence handling, and quality assurance.",
+  keywords: "digital forensics, case management, evidence handling, chain of custody, quality assurance, forensic investigation",
+  authors: [{ name: "Clear Intel" }],
+  creator: "Clear Intel",
+  publisher: "Clear Intel",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
 }
 
 export default function RootLayout({
@@ -30,12 +40,14 @@ export default function RootLayout({
         >
           <AuthProvider>
             <SidebarProvider>
-              <div className="flex h-screen">
-                <MainSidebar />
-                <MainContent>
-                  {children}
-                </MainContent>
-              </div>
+              <ErrorBoundary>
+                <div className="flex h-screen">
+                  <MainSidebar />
+                  <MainContent>
+                    {children}
+                  </MainContent>
+                </div>
+              </ErrorBoundary>
               <Toaster />
               <div id="portal-root" />
             </SidebarProvider>

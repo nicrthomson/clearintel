@@ -1,61 +1,83 @@
-# Dependencies and build
+# dependencies
 /node_modules
-/.next
-/.vercel
-.vercelignore
+/.pnp
+.pnp.js
 
-# Environment files
-.env*
-!.env.example
+# testing
+/coverage
 
-# IDE and system files
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
 .DS_Store
-.vscode
-.idea
+*.pem
 
-# Debug and history files
-.aider.chat.history.md
-.aider.input.history
-.aider.tags.cache.v3
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 
-# Temporary and local files
-temp.txt
-commands.txt
-qa_template.txt
-schema_updates.txt
-test-prisma.ts
-def process_tree(lines):.py.py
-process_tree.py
+# local env files
+.env
+.env*.local
+.env.development
+.env.test
+.env.production
 
-# Generated files
-next-env.d.ts
-
-# Upload and report directories
-/uploads
-/quickreports
-/public/reports
-/public/uploads
-
-# Assets and images
-mono.png
-screen.png
-add-folder
-
-# Documentation (optional, if you want to exclude)
-# ADMIN_SETUP.md
-# CLEANUP.md
-# COMMANDS.md
-# README.md
-# SETUP.md
-
-# Build outputs
-*.log
-.turbo
+# vercel
 .vercel
 
-# TypeScript
+# typescript
 *.tsbuildinfo
+next-env.d.ts
 
-# Local development
-local.*
-*.local
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# uploads and generated content
+/uploads/
+/public/reports/
+/public/evidence/
+/public/temp/
+
+# logs
+/logs/
+*.log
+
+# database
+*.sqlite
+*.sqlite3
+/prisma/dev.db
+
+# certificates
+*.pem
+*.crt
+*.key
+
+# backups
+/backups/
+*.backup
+*.bak
+
+# temporary files
+*.tmp
+.temp/
+.cache/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

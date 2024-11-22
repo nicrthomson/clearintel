@@ -1,10 +1,10 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { useSidebar } from "./sidebar-context";
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+import { useSidebar } from "./sidebar-context"
 import {
   LayoutDashboard,
   FolderOpen,
@@ -14,7 +14,7 @@ import {
   Building2,
   Microscope,
   Users2,
-} from "lucide-react";
+} from "lucide-react"
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
@@ -23,11 +23,11 @@ const navigation = [
   { name: "Contacts", href: "/contacts", icon: Users2 },
   { name: "Lab", href: "/lab", icon: Microscope },
   { name: "Settings", href: "/settings", icon: Settings },
-];
+]
 
 export function MainSidebar() {
-  const { collapsed, setCollapsed } = useSidebar();
-  const pathname = usePathname();
+  const { collapsed, setCollapsed } = useSidebar()
+  const pathname = usePathname()
 
   return (
     <div 
@@ -49,7 +49,7 @@ export function MainSidebar() {
       {/* Navigation */}
       <nav className="flex flex-col gap-1.5 p-3">
         {navigation.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive = pathname === item.href
           return (
             <Link 
               key={item.name} 
@@ -69,7 +69,7 @@ export function MainSidebar() {
                 {item.name}
               </span>
             </Link>
-          );
+          )
         })}
       </nav>
 
@@ -108,5 +108,5 @@ export function MainSidebar() {
         )} />
       </Button>
     </div>
-  );
+  )
 }

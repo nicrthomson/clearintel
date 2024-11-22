@@ -1,0 +1,10 @@
+README.md
+.git
+.env
+.env.*
+node_modules
+quickreports
+uploads
+.next
+prisma/migrations
+*.log
