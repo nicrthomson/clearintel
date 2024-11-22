@@ -1,13 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { defaultTemplate } from "@/lib/defaultTemplate";
 
-export async function GET(
-  request: Request,
-  { params }: { params: { caseId: string } }
-) {
+export const dynamic = 'force-dynamic';
+
+export async function GET(request: NextRequest) {
   console.log("[QA_RESPONSES_GET] Request received");
   try {
     const session = await getServerSession(authOptions);
@@ -15,12 +14,14 @@ export async function GET(
 
     if (!session?.user?.organization_id) {
       console.log("[QA_RESPONSES_GET] Unauthorized - missing organization_id");
-      return new NextResponse("Unauthorized", { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const caseId = parseInt(params.caseId);
+    // Get case ID from search params
+    const { searchParams } = new URL(request.url);
+    const caseId = parseInt(searchParams.get('caseId') || '');
     if (isNaN(caseId)) {
-      return new NextResponse("Invalid case ID", { status: 400 });
+      return NextResponse.json({ error: "Invalid case ID" }, { status: 400 });
     }
 
     // First check if organization has any checklist items
@@ -107,6 +108,6 @@ export async function GET(
     return NextResponse.json(responses);
   } catch (error) {
     console.error("[QA_RESPONSES_GET] Error:", error);
-    return new NextResponse("Internal error", { status: 500 });
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }

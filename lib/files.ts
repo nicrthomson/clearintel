@@ -16,10 +16,17 @@ export async function ensureUploadsDirectory() {
 export async function saveUploadedFile(file: Buffer, originalName: string) {
   await ensureUploadsDirectory();
 
-  // Generate unique filename
-  const ext = originalName.split(".").pop() || "";
-  const uniqueId = crypto.randomBytes(16).toString("hex");
-  const fileName = `${uniqueId}.${ext}`;
+  // Clean the original filename
+  const cleanName = originalName.replace(/[^a-zA-Z0-9.-]/g, '_').toLowerCase();
+  
+  // Split name and extension
+  const nameParts = cleanName.split('.');
+  const ext = nameParts.pop() || "";
+  const baseName = nameParts.join('.');
+  
+  // Add timestamp to ensure uniqueness while preserving original name
+  const timestamp = Date.now();
+  const fileName = `${baseName}_${timestamp}.${ext}`;
   const filePath = join(UPLOADS_DIR, fileName);
 
   // Calculate hashes while writing

@@ -51,15 +51,11 @@ const reportSchema = z.object({
     }),
     evidence: z.object({
       enabled: z.boolean(),
+      includeStorageLocation: z.boolean(),
+      includeAcquisitionDate: z.boolean(),
       includeChainOfCustody: z.boolean(),
-      includeHashes: z.boolean(),
-      includeMetadata: z.boolean(),
-      hashes: z.object({
-        md5: z.boolean(),
-        sha1: z.boolean(),
-        sha256: z.boolean(),
-        sha512: z.boolean()
-      })
+      includeMD5: z.boolean(),
+      includeSHA256: z.boolean(),
     }),
     activities: z.object({
       enabled: z.boolean(),
@@ -77,8 +73,55 @@ const reportSchema = z.object({
       includeContact: z.boolean(),
       typedSignature: z.string().optional(),
     }),
+    executiveSummary: z.object({
+      enabled: z.boolean(),
+      content: z.string().optional(),
+    }),
+    timeline: z.object({
+      enabled: z.boolean(),
+      includeActivities: z.boolean(),
+      includeEvidence: z.boolean(),
+      includeNotes: z.boolean(),
+      dateRange: z.object({
+        start: z.string().optional(),
+        end: z.string().optional(),
+      }).optional(),
+    }),
+    methodology: z.object({
+      enabled: z.boolean(),
+      content: z.string().optional(),
+    }),
+    equipment: z.object({
+      enabled: z.boolean(),
+      includeTools: z.boolean(),
+      includeVersions: z.boolean(),
+    }),
+    relatedCases: z.object({
+      enabled: z.boolean(),
+      includeDescription: z.boolean(),
+    }),
+    header: z.object({
+      enabled: z.boolean(),
+      customText: z.string().optional(),
+      includePageNumbers: z.boolean(),
+      includeLogo: z.boolean(),
+    }),
+    footer: z.object({
+      enabled: z.boolean(), 
+      customText: z.string().optional(),
+      includePageNumbers: z.boolean(),
+      includeDisclaimer: z.boolean(),
+    }),
   }),
   variables: z.record(z.any()),
+  documentProperties: z.object({
+    title: z.string().optional(),
+    author: z.string().optional(),
+    subject: z.string().optional(),
+    keywords: z.string().optional(),
+    confidential: z.boolean(),
+    draft: z.boolean(),
+  }),
 })
 
 type FormValues = z.infer<typeof reportSchema>
@@ -119,15 +162,11 @@ export function NewReportDialog({
         },
         evidence: {
           enabled: true,
+          includeStorageLocation: true,
+          includeAcquisitionDate: true,
           includeChainOfCustody: true,
-          includeHashes: true,
-          includeMetadata: true,
-          hashes: {
-            md5: true,
-            sha1: false,
-            sha256: true,
-            sha512: false
-          }
+          includeMD5: true,
+          includeSHA256: false,
         },
         activities: {
           enabled: true,
@@ -145,8 +184,55 @@ export function NewReportDialog({
           includeContact: false,
           typedSignature: '',
         },
+        executiveSummary: {
+          enabled: true,
+          content: '',
+        },
+        timeline: {
+          enabled: true,
+          includeActivities: true,
+          includeEvidence: true,
+          includeNotes: true,
+          dateRange: {
+            start: '',
+            end: '',
+          },
+        },
+        methodology: {
+          enabled: true,
+          content: '',
+        },
+        equipment: {
+          enabled: true,
+          includeTools: true,
+          includeVersions: true,
+        },
+        relatedCases: {
+          enabled: true,
+          includeDescription: true,
+        },
+        header: {
+          enabled: true,
+          customText: '',
+          includePageNumbers: true,
+          includeLogo: true,
+        },
+        footer: {
+          enabled: true,
+          customText: '',
+          includePageNumbers: true,
+          includeDisclaimer: true,
+        },
       },
       variables: {},
+      documentProperties: {
+        title: '',
+        author: '',
+        subject: '',
+        keywords: '',
+        confidential: false,
+        draft: false,
+      },
     }
   })
 
@@ -242,7 +328,37 @@ export function NewReportDialog({
             {/* Report Options */}
             <div className="space-y-4">
               <h3 className="font-medium">Report Options</h3>
-              <Accordion type="multiple" defaultValue={["cover-page", "case-summary", "evidence"]}>
+              <Accordion type="multiple" defaultValue={["document-properties", "header", "case-summary"]}>
+                <ReportSection
+                  form={form}
+                  title="Document Properties"
+                  basePath="documentProperties"
+                  options={[
+                    { key: "confidential", label: "Mark as Confidential" },
+                    { key: "draft", label: "Mark as Draft" },
+                  ]}
+                  customFields={[
+                    { key: "title", label: "Document Title", type: "input" },
+                    { key: "author", label: "Author", type: "input" },
+                    { key: "subject", label: "Subject", type: "input" },
+                    { key: "keywords", label: "Keywords", type: "input" },
+                  ]}
+                />
+
+                <ReportSection
+                  form={form}
+                  title="Header & Footer"
+                  basePath="options.header"
+                  options={[
+                    { key: "enabled", label: "Include Header" },
+                    { key: "includeLogo", label: "Use Organization Logo" },
+                    { key: "includePageNumbers", label: "Show Page Numbers" },
+                  ]}
+                  customFields={[
+                    { key: "customText", label: "Custom Header Text", type: "textarea" },
+                  ]}
+                />
+
                 <ReportSection
                   form={form}
                   title="Cover Page"
@@ -255,45 +371,77 @@ export function NewReportDialog({
 
                 <ReportSection
                   form={form}
-                  title="Case Summary"
-                  basePath="options.caseSummary"
+                  title="Executive Summary"
+                  basePath="options.executiveSummary"
                   options={[
-                    { key: "enabled", label: "Include Case Summary" },
-                    { key: "includeMyInfo", label: "Include My Information" },
-                    { key: "includeClientInfo", label: "Include Client Information" },
-                    { key: "includeCaseDescription", label: "Include Case Description" },
+                    { key: "enabled", label: "Include Executive Summary" },
                   ]}
                   customFields={[
                     {
-                      key: "customSummary",
-                      label: "Custom Summary",
+                      key: "content",
+                      label: "Summary Content",
                       type: "textarea",
-                      description: "Add any additional information to include in the summary",
+                      description: "Provide an executive summary of the case",
                     },
                   ]}
                 />
 
                 <ReportSection
                   form={form}
-                  title="Evidence Details"
-                  basePath="options.evidence"
+                  title="Case Summary"
+                  basePath="options.caseSummary"
                   options={[
-                    { key: "enabled", label: "Include Evidence" },
-                    { key: "includeChainOfCustody", label: "Include Chain of Custody" },
-                    { key: "includeHashes", label: "Include File Hashes" },
-                    { key: "includeMetadata", label: "Include Metadata" },
-                    { key: "hashes.md5", label: "Include MD5 Hash" },
-                    { key: "hashes.sha1", label: "Include SHA1 Hash" },
-                    { key: "hashes.sha256", label: "Include SHA256 Hash" },
-                    { key: "hashes.sha512", label: "Include SHA512 Hash" },
+                    { key: "enabled", label: "Include Case Summary" },
+                    { key: "includeMyInfo", label: "Include Examiner Information" },
+                    { key: "includeClientInfo", label: "Include Client Information" },
+                    { key: "includeCaseDescription", label: "Include Case Description" },
                   ]}
                   customFields={[
                     {
-                      key: "dateRange",
-                      label: "Date Range",
+                      key: "customSummary",
+                      label: "Additional Notes",
+                      type: "textarea",
+                    },
+                  ]}
+                />
+
+                <ReportSection
+                  form={form}
+                  title="Evidence"
+                  basePath="options.evidence"
+                  options={[
+                    { key: "enabled", label: "Include Evidence" },
+                    { key: "includeStorageLocation", label: "Include Storage Location" },
+                    { key: "includeAcquisitionDate", label: "Include Date Acquired" },
+                    { key: "includeChainOfCustody", label: "Include Chain of Custody" },
+                    { key: "includeMD5", label: "Include MD5 Hash" },
+                    { key: "includeSHA256", label: "Include SHA256 Hash" },
+                  ]}
+                />
+
+                <ReportSection
+                  form={form}
+                  title="Timeline"
+                  basePath="options.timeline"
+                  options={[
+                    { key: "enabled", label: "Include Timeline" },
+                    { key: "includeActivities", label: "Include Activities" },
+                    { key: "includeEvidence", label: "Include Evidence" },
+                    { key: "includeNotes", label: "Include Notes" },
+                  ]}
+                  customFields={[
+                    {
+                      key: "dateRange.start",
+                      label: "Start Date",
                       type: "input",
-                      description: "Only include evidence from this date range"
-                    }
+                      description: "Start date for timeline (YYYY-MM-DD)",
+                    },
+                    {
+                      key: "dateRange.end",
+                      label: "End Date",
+                      type: "input",
+                      description: "End date for timeline (YYYY-MM-DD)",
+                    },
                   ]}
                 />
 
@@ -319,21 +467,71 @@ export function NewReportDialog({
 
                 <ReportSection
                   form={form}
+                  title="Methodology"
+                  basePath="options.methodology"
+                  options={[
+                    { key: "enabled", label: "Include Methodology" },
+                  ]}
+                  customFields={[
+                    {
+                      key: "content",
+                      label: "Methodology Description",
+                      type: "textarea",
+                      description: "Describe the methodology used in this investigation",
+                    },
+                  ]}
+                />
+
+                <ReportSection
+                  form={form}
+                  title="Equipment & Tools"
+                  basePath="options.equipment"
+                  options={[
+                    { key: "enabled", label: "Include Equipment Section" },
+                    { key: "includeTools", label: "Include Software Tools" },
+                    { key: "includeVersions", label: "Include Version Information" },
+                  ]}
+                />
+
+                <ReportSection
+                  form={form}
+                  title="Related Cases"
+                  basePath="options.relatedCases"
+                  options={[
+                    { key: "enabled", label: "Include Related Cases" },
+                    { key: "includeDescription", label: "Include Case Descriptions" },
+                  ]}
+                />
+
+                <ReportSection
+                  form={form}
                   title="Signature"
                   basePath="options.signature"
                   options={[
                     { key: "enabled", label: "Include Signature Section" },
+                    { key: "includeDigitalSignature", label: "Include Digital Signature" },
                     { key: "includeTitle", label: "Include Title" },
                     { key: "includeOrganization", label: "Include Organization" },
-                    { key: "includeContact", label: "Include Contact Information" }
+                    { key: "includeContact", label: "Include Contact Information" },
                   ]}
                   customFields={[
                     {
                       key: "typedSignature",
-                      label: "Signature",
+                      label: "Typed Signature",
                       type: "input",
-                      description: "Type your name as your signature"
-                    }
+                      description: "Type your name as your signature",
+                    },
+                  ]}
+                />
+
+                <ReportSection
+                  form={form}
+                  title="Case Notes"
+                  basePath="options.notes"
+                  options={[
+                    { key: "enabled", label: "Include Case Notes" },
+                    { key: "includeAuthor", label: "Include Note Author" },
+                    { key: "includeTimestamp", label: "Include Note Timestamp" },
                   ]}
                 />
               </Accordion>

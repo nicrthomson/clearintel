@@ -1,10 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { serializeBigInt } from "@/lib/utils";
 
-export async function GET() {
+export const dynamic = 'force-dynamic';
+
+export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
@@ -37,4 +39,4 @@ export async function GET() {
     console.error("[EVIDENCE_GET_ALL]", error);
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
-} 
+}

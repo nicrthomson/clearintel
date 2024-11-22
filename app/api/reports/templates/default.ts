@@ -90,8 +90,8 @@ export const defaultHTMLTemplate = {
             {{#each case.evidence}}
               {{#if (eq type.name "Image")}}
                 <div class="gallery-item">
-                  <img src="{{this.filePath}}" alt="{{this.name}}" />
-                  <p class="caption">{{this.name}}</p>
+                  <img src="graphics/{{name}}" alt="{{name}}" />
+                  <p class="caption">{{name}}</p>
                 </div>
               {{/if}}
             {{/each}}
@@ -171,109 +171,4 @@ export const defaultHTMLTemplate = {
       `
     }
   ]
-}
-
-const defaultCSS = `
-  @font-face {
-    font-family: 'Helvetica';
-    src: url('/fonts/Helvetica.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-  }
-
-  @font-face {
-    font-family: 'Helvetica';
-    src: url('/fonts/Helvetica-Bold.ttf') format('truetype');
-    font-weight: bold;
-    font-style: normal;
-  }
-
-  @font-face {
-    font-family: 'Helvetica';
-    src: url('/fonts/Helvetica-Oblique.ttf') format('truetype');
-    font-weight: normal;
-    font-style: italic;
-  }
-
-  @font-face {
-    font-family: 'Helvetica';
-    src: url('/fonts/Helvetica-BoldOblique.ttf') format('truetype');
-    font-weight: bold;
-    font-style: italic;
-  }
-
-  @import url('https://fonts.googleapis.com/css2?family=Whisper&display=swap');
-  
-  body {
-    font-family: 'Helvetica', sans-serif;
-    line-height: 1.6;
-    color: #333;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  
-  h1, h2, h3 {
-    font-family: 'Helvetica', sans-serif;
-    font-weight: bold;
-    color: #2c3e50;
-    margin-top: 1.5em;
-  }
-  
-  .info-list {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .info-list li {
-    margin-bottom: 0.5em;
-  }
-  
-  .evidence-item, .activity, .note {
-    border: 1px solid #ddd;
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 4px;
-  }
-  
-  .chain-of-custody {
-    margin-top: 10px;
-    padding: 10px;
-    background: #f8f9fa;
-  }
-  
-  .signature-section {
-    margin-top: 50px;
-    padding-top: 20px;
-    border-top: 2px solid #ddd;
-  }
-  
-  .typed-signature {
-    margin: 30px 0;
-  }
-  
-  .signature-text {
-    font-family: 'Whisper', cursive;
-    font-size: 36px;
-    color: #000;
-    border-bottom: 1px solid #000;
-    display: inline-block;
-    padding: 0 20px 5px;
-  }
-  
-  .examiner-title {
-    font-weight: bold;
-    margin: 10px 0 5px;
-  }
-  
-  .organization {
-    color: #666;
-    margin-bottom: 10px;
-  }
-  
-  .contact-info {
-    font-size: 0.9em;
-    color: #666;
-    margin-top: 15px;
-  }
-`;
+};

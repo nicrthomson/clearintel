@@ -1,13 +1,15 @@
-import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
-export async function GET(request: Request) {
+export const dynamic = 'force-dynamic';
+
+export async function GET(request: NextRequest) {
   try {
     // Get organization ID from query params
-    const { searchParams } = new URL(request.url)
-    const organizationId = parseInt(searchParams.get('org') || '1')
+    const { searchParams } = new URL(request.url);
+    const organizationId = parseInt(searchParams.get('org') || '1');
 
-    console.log('Checking templates for organization:', organizationId)
+    console.log('Checking templates for organization:', organizationId);
 
     // Get all templates for the organization
     const templates = await prisma.qATemplate.findMany({
@@ -25,14 +27,14 @@ export async function GET(request: Request) {
       orderBy: {
         name: 'asc',
       },
-    })
+    });
 
     // Get organization details
     const organization = await prisma.organization.findUnique({
       where: {
         id: organizationId,
       },
-    })
+    });
 
     // Get all users in the organization
     const users = await prisma.user.findMany({
@@ -45,15 +47,15 @@ export async function GET(request: Request) {
         organization_id: true,
         isOrgAdmin: true,
       },
-    })
+    });
 
-    console.log(`Found ${templates.length} templates`)
+    console.log(`Found ${templates.length} templates`);
     templates.forEach(template => {
-      console.log(`- ${template.name} (${template.type}): ${template.checklistItems.length} items`)
+      console.log(`- ${template.name} (${template.type}): ${template.checklistItems.length} items`);
       template.checklistItems.forEach(item => {
-        console.log(`  - ${item.name} (${item.category})`)
-      })
-    })
+        console.log(`  - ${item.name} (${item.category})`);
+      });
+    });
 
     return NextResponse.json({
       organization,
@@ -73,12 +75,12 @@ export async function GET(request: Request) {
         categories: Array.from(new Set(template.checklistItems.map(item => item.category))),
       })),
       templateCount: templates.length,
-    })
+    });
   } catch (error) {
-    console.error("[DEBUG_QA_TEMPLATES]", error)
+    console.error("[DEBUG_QA_TEMPLATES]", error);
     return NextResponse.json({
       error: "Internal error",
       details: error instanceof Error ? error.message : String(error),
-    }, { status: 500 })
+    }, { status: 500 });
   }
 }
