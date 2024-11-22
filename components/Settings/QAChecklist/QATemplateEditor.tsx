@@ -87,9 +87,21 @@ export function QATemplateEditor({ template: initialTemplate }: QATemplateEditor
       order: template.checklistItems.length,
     }
 
+    // Create a new QAChecklistItem by adding the required fields
+    const newQAItem: QAChecklistItem = {
+      ...item,
+      id: Date.now(), // Temporary ID until saved
+      organization_id: template.organization_id,
+      template_id: template.id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      value: null,
+      notes: null
+    }
+
     const updatedTemplate = {
       ...template,
-      checklistItems: [...template.checklistItems, item as QAChecklistItem],
+      checklistItems: [...template.checklistItems, newQAItem],
     }
 
     await saveTemplate(updatedTemplate)
