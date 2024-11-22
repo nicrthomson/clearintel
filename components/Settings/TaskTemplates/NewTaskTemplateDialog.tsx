@@ -39,7 +39,7 @@ const taskTemplateSchema = z.object({
   checklist: z.array(z.object({
     text: z.string(),
     required: z.boolean(),
-  })).optional(),
+  })).optional().or(z.string()).nullable(),
 });
 
 type TaskTemplateFormValues = z.infer<typeof taskTemplateSchema>;
