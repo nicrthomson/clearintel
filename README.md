@@ -29,7 +29,7 @@ A comprehensive digital forensics case management platform designed to streamlin
 ![Report Template](docs/images/reports/report-template.png)
 *Report Generation - Professional report templates and generation*
 
-> **[View Interactive Screenshot Gallery](docs/gallery.html)** - Explore our complete gallery of features with an interactive viewer that lets you browse through all screenshots with full-size views and easy navigation.
+> **[View Interactive Screenshot Gallery](https://nicrthomson.github.io/clearintel)** - Explore our complete gallery of features with an interactive viewer that lets you browse through all screenshots with full-size views and easy navigation.
 
 ## Core Features
 
