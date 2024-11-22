@@ -2,6 +2,33 @@
 
 A comprehensive digital forensics case management platform designed to streamline investigations, evidence handling, and quality assurance processes.
 
+## Screenshots
+
+### Case Management
+![Case Overview](docs/images/case-management/case-overview.png)
+*Case Overview - Comprehensive view of case details and status*
+
+![Case Details](docs/images/case-management/case-details.png)
+*Case Details - Detailed information and management options*
+
+![Case List](docs/images/case-management/case-list.png)
+*Case List - Overview of all cases with filtering and sorting*
+
+### Quality Assurance
+![QA Checklist](docs/images/qa-review/qa-checklist.png)
+*QA Checklist - Comprehensive quality assurance review process*
+
+![QA Template](docs/images/qa-review/qa-template.png)
+*QA Template - Customizable templates for consistent reviews*
+
+### Forensic Images
+![Image Management](docs/images/forensic-images/image-list.png)
+*Forensic Image Management - Track and manage forensic images*
+
+### Reports
+![Report Template](docs/images/reports/report-template.png)
+*Report Generation - Professional report templates and generation*
+
 ## Core Features
 
 ### Case Management

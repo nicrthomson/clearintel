@@ -27,7 +27,7 @@ export default function CasePage({ params }: CasePageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const { images, mutate: mutateImages } = useForensicImages(parseInt(params.id));
+  const { images, refresh } = useForensicImages(parseInt(params.id));
 
   const loadCase = async () => {
     try {
@@ -137,7 +137,7 @@ export default function CasePage({ params }: CasePageProps) {
           <ImagesTable 
             caseId={caseData.id}
             images={images}
-            mutate={mutateImages}
+            mutate={refresh}          
           />
         </TabsContent>
 
